@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 /* =========================================================================
@@ -1621,13 +1623,22 @@ type Route =
   | { view: "results"; examId: string };
 
 const PharmacologyQuizApp: React.FC = () => {
-  const [state, setState] = useState<AppState>(() => loadState());
+  // El estado inicial es vacío tanto en servidor como en cliente para que la
+  // hidratación coincida; localStorage se lee después del primer render.
+  const [state, setState] = useState<AppState>({});
+  const [hydrated, setHydrated] = useState(false);
   const [route, setRoute] = useState<Route>({ view: "dashboard" });
 
-  // Persistir cada cambio de estado
   useEffect(() => {
-    saveState(state);
-  }, [state]);
+    setState(loadState());
+    setHydrated(true);
+  }, []);
+
+  // Persistir cada cambio de estado (solo después de cargar el guardado,
+  // para no sobrescribirlo con el estado vacío inicial)
+  useEffect(() => {
+    if (hydrated) saveState(state);
+  }, [state, hydrated]);
 
   const examsById = useMemo(
     () => new Map(EXAMS_DATA.map((e) => [e.id, e])),
