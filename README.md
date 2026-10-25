@@ -1,13 +1,11 @@
 # quiizzer
 
-Banco de exámenes. Next.js 16 (App Router) + Supabase.
+Quiizzer. Next.js 16 (App Router) + Supabase.
 
-El listado de exámenes es público. Para tomar uno, el alumno registra su
-nombre y correo. El correo identifica a la persona: la primera vez se crea su
-cuenta en Supabase Auth sin contraseña y las siguientes veces, desde cualquier
-navegador, se entra en esa misma cuenta. La sesión queda en cookies y todos
-los intentos se enlazan a ella. Toda la lectura y escritura pasa por las rutas de API de Next
-(`app/api/*`); el navegador nunca habla con Supabase directamente, y las
+El listado de exámenes es público. Para tomar uno, el alumno crea una cuenta o
+inicia sesión mediante correo y contraseña o Google. La sesión queda en cookies
+y todos los intentos se enlazan a ella. Toda la lectura y escritura pasa por las rutas de API de Next
+(`src/app/api/*`); el navegador nunca habla con Supabase directamente, y las
 respuestas correctas solo se entregan cuando un intento está finalizado.
 
 ## Requisitos
@@ -44,10 +42,22 @@ respuestas correctas solo se entregan cuando un intento está finalizado.
 | GET | `/api/profile` | Perfil registrado en este navegador, o `null` |
 | POST | `/api/profile` | Registra `{ fullName, email }`; crea la cuenta si no existe e inicia sesión |
 | POST | `/api/auth/signout` | Cierra la sesión de este navegador ("No soy yo") |
+| POST | `/api/auth/login` | Inicia sesión con correo y contraseña |
+| POST | `/api/auth/google` | Genera la URL OAuth de Google conservando el destino actual |
+| GET | `/api/auth/callback` | Canjea el código OAuth o de recuperación por una sesión |
+| POST | `/api/auth/recover` | Envía el correo para restablecer la contraseña |
+| PUT | `/api/auth/password` | Actualiza la contraseña durante una sesión de recuperación |
 | POST | `/api/attempts` | Crea un intento `{ quizId }`; exige perfil registrado |
 | GET | `/api/attempts/:id` | Intento con preguntas; incluye soluciones si está finalizado |
 | PUT | `/api/attempts/:id/answers` | Guarda una respuesta `{ questionId, selectedAnswer }` |
 | POST | `/api/attempts/:id/complete` | Recalifica en el servidor y cierra el intento |
+
+## Configuración de autenticación
+
+- Activa el proveedor **Email** y el proveedor **Google** en Supabase Authentication.
+- Configura en Google las credenciales OAuth que Supabase muestra para el proveedor.
+- Agrega las URLs de la aplicación local y desplegada a **Authentication → URL Configuration → Redirect URLs**. Los flujos regresan mediante `/api/auth/callback`.
+- Configura el proveedor de correo SMTP y la plantilla de recuperación de Supabase para que “¿Olvidaste tu contraseña?” pueda entregar el enlace.
 
 ## Despliegue en Vercel
 

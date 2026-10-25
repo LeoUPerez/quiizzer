@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import type { ProfileDto } from "@/src/types/api";
+import type { ProfileDto } from "@/types/api";
 
 interface ProfileAvatarProps {
   profile: ProfileDto;

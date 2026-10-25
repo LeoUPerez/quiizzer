@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { QuestionRenderer } from "@/src/components/QuestionRenderer";
-import { cx, TYPE_LABEL } from "@/src/components/ui";
-import type { QuestionDto, QuizHeaderDto } from "@/src/types/api";
+import { QuestionRenderer } from "@/components/QuestionRenderer";
+import { cx, TYPE_LABEL } from "@/components/ui";
+import type { QuestionDto, QuizHeaderDto } from "@/types/api";
 
 interface ExamViewProps {
   quiz: QuizHeaderDto;

@@ -1,15 +1,17 @@
 "use client";
 
 import React from "react";
-import { ProfileAvatar } from "@/src/components/ProfileAvatar";
-import { Spinner } from "@/src/components/Spinner";
-import { cx, getStatus, STATUS_META } from "@/src/components/ui";
-import type { ProfileDto, QuizSummaryDto } from "@/src/types/api";
+import { ProfileAvatar } from "@/components/ProfileAvatar";
+import { Spinner } from "@/components/Spinner";
+import { cx, getStatus, STATUS_META } from "@/components/ui";
+import type { ProfileDto, QuizSummaryDto } from "@/types/api";
 
 interface DashboardProps {
   quizzes: QuizSummaryDto[] | null;
   profile: ProfileDto | null;
   busy: boolean;
+  subjectFilter?: string | null;
+  topicFilter?: string | null;
   onStart: (quiz: QuizSummaryDto) => void;
   onReview: (quiz: QuizSummaryDto) => void;
   onRetake: (quiz: QuizSummaryDto) => void;
@@ -21,13 +23,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
   quizzes,
   profile,
   busy,
+  subjectFilter,
+  topicFilter,
   onStart,
   onReview,
   onRetake,
   onSwitchUser,
   onSignIn,
 }) => {
-  const list = quizzes ?? [];
+  const list = (quizzes ?? []).filter(
+    (quiz) =>
+      (!subjectFilter || quiz.subject === subjectFilter) &&
+      (!topicFilter || `${quiz.title} ${quiz.topic}`.toLocaleLowerCase().includes(topicFilter.toLocaleLowerCase())),
+  );
   const completedCount = list.filter(
     (q) => getStatus(q.latestAttempt) === "completed",
   ).length;
@@ -49,7 +57,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
             {subjects.length > 0 ? subjects.join(" · ") : "Ciencias de la salud"}
           </p>
           <h1 className="mt-1 font-bold text-slate-900 text-3xl sm:text-4xl tracking-tight">
-            Banco de exámenes
+            Quiizzer
           </h1>
           <p className="mt-2 text-slate-600">
             {!quizzes

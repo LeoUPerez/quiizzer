@@ -1,12 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { HttpError, orThrow } from "@/src/lib/api/http";
+import { HttpError, orThrow } from "@/lib/api/http";
 import type {
   AttemptDetailDto,
   GradedQuestionDto,
   OptionDto,
   QuestionDto,
   QuestionType,
-} from "@/src/types/api";
+} from "@/types/api";
 
 interface AttemptRow {
   id: string;

@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
-import { supabasePublicKey, supabaseSecretKey, supabaseUrl } from "@/src/lib/env";
+import { supabasePublicKey, supabaseSecretKey, supabaseUrl } from "@/lib/env";
 
 /**
  * Cliente ligado a la sesión del usuario (cookies). Todas sus consultas pasan

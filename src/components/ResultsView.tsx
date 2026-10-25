@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { cx, TYPE_LABEL } from "@/src/components/ui";
-import type { GradedQuestionDto, QuizHeaderDto } from "@/src/types/api";
+import { cx, TYPE_LABEL } from "@/components/ui";
+import type { GradedQuestionDto, QuizHeaderDto } from "@/types/api";
 
 interface ResultsViewProps {
   quiz: QuizHeaderDto;

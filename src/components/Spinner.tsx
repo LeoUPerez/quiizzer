@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { cx } from "@/src/components/ui";
+import { cx } from "@/components/ui";
 
 interface SpinnerProps {
   className?: string;

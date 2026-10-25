@@ -1,6 +1,6 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import { HttpError } from "@/src/lib/api/http";
-import { createSupabaseServerClient } from "@/src/lib/supabase/server";
+import { HttpError } from "@/lib/api/http";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export interface AuthedContext {
   supabase: SupabaseClient;

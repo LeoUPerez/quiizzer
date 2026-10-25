@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { cx } from "@/src/components/ui";
-import type { QuestionDto } from "@/src/types/api";
+import { cx } from "@/components/ui";
+import type { QuestionDto } from "@/types/api";
 
 export interface QuestionRendererProps {
   question: QuestionDto;
