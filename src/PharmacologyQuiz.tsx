@@ -1,20 +1,16 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Dashboard } from "@/src/components/Dashboard";
-import { ExamView } from "@/src/components/ExamView";
-import { RegisterModal } from "@/src/components/RegisterModal";
-import { ResultsView } from "@/src/components/ResultsView";
-import { LoadingOverlay } from "@/src/components/Spinner";
-import { api, ApiError, errorMessage } from "@/src/lib/api-client";
-import type { AttemptDetailDto, ProfileDto, QuizSummaryDto } from "@/src/types/api";
+import { QuizApplication } from "@/components/templates/QuizApplication";
+import { useAuthModal } from "@/hooks/useAuthModal";
+import { api, ApiError, errorMessage } from "@/lib/api-client";
+import type { AttemptDetailDto, ProfileDto, QuizSummaryDto } from "@/types/api";
 
 type Route = { view: "dashboard" } | { view: "attempt"; attemptId: string };
 
 /** Acción que quedó en espera hasta que el alumno se registre. */
 type PendingAction =
-  | { kind: "start" | "retake"; quiz: QuizSummaryDto }
-  | { kind: "signin" };
+  { kind: "start" | "retake"; quiz: QuizSummaryDto };
 
 interface Props {
   initialProfile: ProfileDto | null;
@@ -36,8 +32,13 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
   const [busy, setBusy] = useState(false);
   const [busyLabel, setBusyLabel] = useState("Cargando…");
   const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState<PendingAction | null>(null);
-  const [registerError, setRegisterError] = useState<string | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const { openAuth } = useAuthModal();
+  const [catalogFilters] = useState(() => {
+    if (typeof window === "undefined") return { subject: null, topic: null };
+    const params = new URLSearchParams(window.location.search);
+    return { subject: params.get("subject"), topic: params.get("topic") };
+  });
 
   const fail = useCallback((e: unknown) => setError(errorMessage(e)), []);
 
@@ -49,6 +50,15 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
       fail(e);
     }
   }, [fail]);
+
+  const handleAuthenticated = useCallback((authenticatedProfile: ProfileDto) => {
+    setProfile(authenticatedProfile);
+    void loadQuizzes();
+  }, [loadQuizzes]);
+
+  const requestAuthentication = useCallback(() => {
+    openAuth({ onAuthenticated: handleAuthenticated });
+  }, [handleAuthenticated, openAuth]);
 
   useEffect(() => {
     void loadQuizzes();
@@ -86,14 +96,15 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
         // Sin registro (sesión perdida o perfil incompleto): se pide de nuevo.
         if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
           setProfile(null);
-          setPending({ kind: "start", quiz });
+          setPendingAction({ kind: "start", quiz });
+          requestAuthentication();
         } else {
           fail(e);
         }
         setBusy(false);
       }
     },
-    [openAttempt, fail],
+    [openAttempt, fail, requestAuthentication],
   );
 
   /** Si no hay registro, abre el modal y deja la acción en espera. */
@@ -102,17 +113,20 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
       if (profile) {
         void startNewAttempt(action.quiz);
       } else {
-        setRegisterError(null);
-        setPending(action);
+        setPendingAction(action);
+        requestAuthentication();
       }
     },
-    [profile, startNewAttempt],
+    [profile, requestAuthentication, startNewAttempt],
   );
 
   const handleSignIn = useCallback(() => {
-    setRegisterError(null);
-    setPending({ kind: "signin" });
-  }, []);
+    requestAuthentication();
+  }, [requestAuthentication]);
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("signin") === "1") handleSignIn();
+  }, [handleSignIn]);
 
   const handleStart = useCallback(
     (quiz: QuizSummaryDto) => {
@@ -135,31 +149,12 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
     [withProfile],
   );
 
-  const handleRegister = useCallback(
-    async (fullName: string, email: string) => {
-      if (!pending) return;
-      setBusyLabel(pending.kind === "signin" ? "Iniciando sesión…" : "Abriendo examen…");
-      setBusy(true);
-      setRegisterError(null);
-      try {
-        const { profile: created } = await api.register(fullName, email);
-        setProfile(created);
-        const action = pending;
-        setPending(null);
-        if (action.kind === "signin") {
-          // Solo identificarse: se recarga el listado con su progreso.
-          await loadQuizzes();
-          setBusy(false);
-          return;
-        }
-        await startNewAttempt(action.quiz);
-      } catch (e) {
-        setRegisterError(errorMessage(e));
-        setBusy(false);
-      }
-    },
-    [pending, startNewAttempt, loadQuizzes],
-  );
+  const resumePendingAction = useCallback(() => {
+    if (!pendingAction) return;
+    const action = pendingAction;
+    setPendingAction(null);
+    void startNewAttempt(action.quiz);
+  }, [pendingAction, startNewAttempt]);
 
   const handleAnswer = useCallback(
     (questionId: number, optionId: string) => {
@@ -232,85 +227,15 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
     void loadQuizzes();
   }, [fail, loadQuizzes]);
 
-  let content: React.ReactNode;
-
-  if (route.view === "attempt" && detail) {
-    const quizSummary: QuizSummaryDto = {
-      ...detail.quiz,
-      questionCount: detail.questions.length,
-      latestAttempt: null,
-    };
-    content = detail.completed ? (
-      <ResultsView
-        quiz={detail.quiz}
-        questions={detail.questions}
-        answers={detail.attempt.answers}
-        score={detail.attempt.score}
-        completedAt={detail.attempt.completedAt}
-        busy={busy}
-        onRetake={() => handleRetake(quizSummary)}
-        onExit={goDashboard}
-      />
-    ) : (
-      <ExamView
-        quiz={detail.quiz}
-        questions={detail.questions}
-        answers={detail.attempt.answers}
-        currentIndex={currentIndex}
-        busy={busy}
-        onAnswer={handleAnswer}
-        onNavigate={handleNavigate}
-        onFinish={handleFinish}
-        onExit={goDashboard}
-      />
-    );
-  } else {
-    content = (
-      <Dashboard
-        quizzes={quizzes}
-        profile={profile}
-        busy={busy}
-        onStart={handleStart}
-        onReview={handleReview}
-        onRetake={handleRetake}
-        onSwitchUser={handleSwitchUser}
-        onSignIn={handleSignIn}
-      />
-    );
-  }
-
-  return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-900 antialiased">
-      {error && (
-        <div
-          role="alert"
-          className="top-0 z-40 sticky flex justify-between items-center gap-4 bg-rose-50 px-4 py-3 border-rose-200 border-b text-rose-800 text-sm"
-        >
-          <span>{error}</span>
-          <button
-            type="button"
-            onClick={() => setError(null)}
-            className="font-semibold hover:underline"
-          >
-            Cerrar
-          </button>
-        </div>
-      )}
-      {content}
-      {busy && !pending && <LoadingOverlay label={busyLabel} />}
-      {pending && (
-        <RegisterModal
-          quizTitle={pending.kind === "signin" ? null : pending.quiz.title}
-          busy={busy}
-          error={registerError}
-          onSubmit={handleRegister}
-          onCancel={() => {
-            if (!busy) setPending(null);
-          }}
-        />
-      )}
-    </div>
-  );
+  return <QuizApplication
+    profile={profile} quizzes={quizzes} route={route} detail={detail} currentIndex={currentIndex}
+    busy={busy} busyLabel={busyLabel} error={error}
+    pendingAction={pendingAction} onResumePending={resumePendingAction} onDismissPending={() => setPendingAction(null)}
+    subjectFilter={catalogFilters.subject} topicFilter={catalogFilters.topic} onDismissError={() => setError(null)} onRetry={() => { setError(null); void loadQuizzes(); }} onStart={handleStart}
+    onReview={handleReview} onRetake={handleRetake} onSwitchUser={handleSwitchUser}
+    onSignIn={handleSignIn} onAnswer={handleAnswer} onNavigate={handleNavigate}
+    onFinish={handleFinish} onExit={goDashboard}
+  />;
 };
 
 export default PharmacologyQuizApp;

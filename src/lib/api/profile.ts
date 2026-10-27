@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { HttpError, orThrow } from "@/src/lib/api/http";
-import type { ProfileDto } from "@/src/types/api";
+import { HttpError, orThrow } from "@/lib/api/http";
+import type { ProfileDto } from "@/types/api";
 
 interface ProfileRow {
   id: string;
@@ -40,12 +40,15 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export const validateRegistration = (input: {
   fullName?: unknown;
   email?: unknown;
-}): { fullName: string; email: string } => {
+  password?: unknown;
+}): { fullName: string; email: string; password: string } => {
   const fullName = typeof input.fullName === "string" ? input.fullName.trim() : "";
   const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
+  const password = typeof input.password === "string" ? input.password : "";
 
   if (fullName.length < 2) throw new HttpError(400, "Escribe tu nombre");
   if (!EMAIL_RE.test(email)) throw new HttpError(400, "El correo no es válido");
+  if (password.length < 8) throw new HttpError(400, "La contraseña debe tener al menos 8 caracteres");
 
-  return { fullName, email };
+  return { fullName, email, password };
 };

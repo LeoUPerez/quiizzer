@@ -1,4 +1,4 @@
-import type { AttemptDetailDto, ProfileDto, QuizSummaryDto } from "@/src/types/api";
+import type { AttemptDetailDto, ProfileDto, QuizSummaryDto } from "@/types/api";
 
 export class ApiError extends Error {
   constructor(
@@ -34,10 +34,34 @@ export const api = {
 
   getProfile: () => request<{ profile: ProfileDto | null }>("/api/profile"),
 
-  register: (fullName: string, email: string) =>
+  register: (fullName: string, email: string, password: string) =>
     request<{ profile: ProfileDto }>("/api/profile", {
       method: "POST",
-      body: JSON.stringify({ fullName, email }),
+      body: JSON.stringify({ fullName, email, password }),
+    }),
+
+  login: (email: string, password: string) =>
+    request<{ profile: ProfileDto }>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+
+  recoverPassword: (email: string) =>
+    request<{ ok: true }>("/api/auth/recover", {
+      method: "POST",
+      body: JSON.stringify({ email }),
+    }),
+
+  updatePassword: (password: string) =>
+    request<{ ok: true }>("/api/auth/password", {
+      method: "PUT",
+      body: JSON.stringify({ password }),
+    }),
+
+  googleSignInUrl: (next: string) =>
+    request<{ url: string }>("/api/auth/google", {
+      method: "POST",
+      body: JSON.stringify({ next }),
     }),
 
   createAttempt: (quizId: string) =>

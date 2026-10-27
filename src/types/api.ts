@@ -1,4 +1,4 @@
-/* Contratos compartidos entre las rutas de API (app/api) y el cliente (src). */
+/* Contratos compartidos entre las rutas de API (src/app/api) y el cliente. */
 
 export type QuestionType = "multiple_choice" | "true_false" | "fill_in_the_blank";
 
@@ -36,6 +36,9 @@ export interface QuizSummaryDto {
   title: string;
   topic: string;
   questionCount: number;
+  questionTypes: QuestionType[];
+  createdAt: string;
+  authorName: string | null;
   /** Último intento del usuario en este examen, si existe. */
   latestAttempt: AttemptSummaryDto | null;
 }
