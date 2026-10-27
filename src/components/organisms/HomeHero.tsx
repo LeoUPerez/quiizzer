@@ -17,10 +17,10 @@ export const HomeHero = () => {
             Explora exámenes creados por otras personas y encuentra tu próximo reto.
           </p>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-4 mt-9">
-            <Link href="/" className="inline-flex items-center gap-2 bg-[#6341DB] hover:bg-[#5132c4] shadow-sm px-5 py-3 rounded-xl focus:outline-none focus-visible:ring-[#6341DB] focus-visible:ring-2 focus-visible:ring-offset-2 font-semibold text-white transition-colors">
+            <Link href="/examenes" className="inline-flex items-center gap-2 bg-[#6341DB] hover:bg-[#5132c4] shadow-sm px-5 py-3 rounded-xl focus:outline-none focus-visible:ring-[#6341DB] focus-visible:ring-2 focus-visible:ring-offset-2 font-semibold text-white transition-colors">
               Explorar exámenes <ArrowRightIcon />
             </Link>
-            <Link href="/registro" className="font-semibold text-[#6341DB] hover:text-[#5132c4] hover:underline underline-offset-4">
+            <Link href="/registro?next=/examenes" className="font-semibold text-[#6341DB] hover:text-[#5132c4] hover:underline underline-offset-4">
               Crear una cuenta
             </Link>
           </div>

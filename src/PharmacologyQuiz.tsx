@@ -231,7 +231,7 @@ const PharmacologyQuizApp: React.FC<Props> = ({ initialProfile }) => {
     profile={profile} quizzes={quizzes} route={route} detail={detail} currentIndex={currentIndex}
     busy={busy} busyLabel={busyLabel} error={error}
     pendingAction={pendingAction} onResumePending={resumePendingAction} onDismissPending={() => setPendingAction(null)}
-    subjectFilter={catalogFilters.subject} topicFilter={catalogFilters.topic} onDismissError={() => setError(null)} onStart={handleStart}
+    subjectFilter={catalogFilters.subject} topicFilter={catalogFilters.topic} onDismissError={() => setError(null)} onRetry={() => { setError(null); void loadQuizzes(); }} onStart={handleStart}
     onReview={handleReview} onRetake={handleRetake} onSwitchUser={handleSwitchUser}
     onSignIn={handleSignIn} onAnswer={handleAnswer} onNavigate={handleNavigate}
     onFinish={handleFinish} onExit={goDashboard}

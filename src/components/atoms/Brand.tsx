@@ -35,7 +35,7 @@ export const Brand = ({ compact = false, linked = true }: BrandProps) => {
 
   return (
     <Link
-      href="/inicio"
+      href="/"
       className="flex items-center gap-2.5 text-slate-950"
       aria-label="Quiizzer, inicio"
     >

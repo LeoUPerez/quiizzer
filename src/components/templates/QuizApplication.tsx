@@ -22,6 +22,7 @@ interface QuizApplicationProps {
   subjectFilter: string | null;
   topicFilter: string | null;
   onDismissError: () => void;
+  onRetry: () => void;
   onResumePending: () => void;
   onDismissPending: () => void;
   onStart: (quiz: QuizSummaryDto) => void;
@@ -37,11 +38,18 @@ interface QuizApplicationProps {
 
 export const QuizApplication = ({
   profile, quizzes, route, detail, currentIndex, busy, busyLabel, error, pendingAction,
-  subjectFilter, topicFilter, onDismissError, onResumePending, onDismissPending, onStart, onReview, onRetake, onSwitchUser, onSignIn, onAnswer,
+  subjectFilter, topicFilter, onDismissError, onRetry, onResumePending, onDismissPending, onStart, onReview, onRetake, onSwitchUser, onSignIn, onAnswer,
   onNavigate, onFinish, onExit,
 }: QuizApplicationProps) => {
   const content = route.view === "attempt" && detail ? (() => {
-    const quizSummary: QuizSummaryDto = { ...detail.quiz, questionCount: detail.questions.length, latestAttempt: null };
+    const quizSummary: QuizSummaryDto = {
+      ...detail.quiz,
+      questionCount: detail.questions.length,
+      questionTypes: [...new Set(detail.questions.map((question) => question.type))],
+      createdAt: "",
+      authorName: null,
+      latestAttempt: null,
+    };
     return detail.completed ? (
       <ResultsView quiz={detail.quiz} questions={detail.questions} answers={detail.attempt.answers} score={detail.attempt.score} completedAt={detail.attempt.completedAt} busy={busy} onRetake={() => onRetake(quizSummary)} onExit={onExit} />
     ) : (
@@ -52,7 +60,7 @@ export const QuizApplication = ({
   );
 
   return <div className="bg-slate-50 min-h-screen font-sans text-slate-900 antialiased">
-    {error && <div role="alert" className="top-0 z-40 sticky flex justify-between items-center gap-4 bg-rose-50 px-4 py-3 border-rose-200 border-b text-rose-800 text-sm"><span>{error}</span><button type="button" onClick={onDismissError} className="font-semibold hover:underline">Cerrar</button></div>}
+    {error && <div role="alert" className="top-0 z-40 sticky flex justify-between items-center gap-4 bg-rose-50 px-4 py-3 border-rose-200 border-b text-rose-800 text-sm"><span>{error}</span><div className="flex gap-3"><button type="button" onClick={onRetry} className="font-semibold hover:underline">Intentar de nuevo</button><button type="button" onClick={onDismissError} className="font-semibold hover:underline">Cerrar</button></div></div>}
     {profile && pendingAction && (
       <div role="status" className="right-4 bottom-4 left-4 z-40 fixed flex sm:flex-row flex-col sm:items-center gap-3 bg-white shadow-xl mx-auto p-4 border border-violet-200 rounded-2xl max-w-xl">
         <p className="flex-1 text-slate-700 text-sm">

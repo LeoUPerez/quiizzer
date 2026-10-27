@@ -44,7 +44,7 @@ export const RegisterPage = ({ next }: { next: string }) => {
 
         <footer className="relative z-10 px-5 pb-6 text-center">
           <Link
-            href="/inicio"
+            href="/"
             className="inline-flex rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-[#6341DB] font-semibold text-[#6341DB] text-sm hover:underline"
           >
             ← Volver al inicio

@@ -1,17 +1,5 @@
-import PharmacologyQuizApp from "@/PharmacologyQuiz";
-import { loadProfile } from "@/lib/api/profile";
-import {
-  createSupabaseAdminClient,
-  createSupabaseServerClient,
-} from "@/lib/supabase/server";
+import { PublicHome } from "@/components/PublicHome";
 
-export default async function HomePage() {
-  const supabase = await createSupabaseServerClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const profile = user ? await loadProfile(createSupabaseAdminClient(), user.id) : null;
-
-  return <PharmacologyQuizApp initialProfile={profile} />;
+export default function HomePage() {
+  return <PublicHome />;
 }

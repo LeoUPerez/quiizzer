@@ -1,5 +1,5 @@
-import { PublicHome } from "@/components/PublicHome";
+import { redirect } from "next/navigation";
 
-export default function PublicHomePage() {
-  return <PublicHome />;
+export default function LegacyHomePage() {
+  redirect("/");
 }

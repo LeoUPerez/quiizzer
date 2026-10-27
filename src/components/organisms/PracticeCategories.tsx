@@ -7,15 +7,15 @@ import {
 } from "@/components/molecules/CategoryCard";
 
 const categories: PracticeCategory[] = [
-  { name: "Bioquímica", href: "/?subject=Bioquímica", imageSrc: "/images/biochemistry.png" },
-  { name: "Programación", href: "/?subject=Programación", imageSrc: "/images/programming.png" },
-  { name: "Matemáticas", href: "/?subject=Matemáticas", imageSrc: "/images/math.png" },
-  { name: "Anatomía", href: "/?subject=Anatomía", imageSrc: "/images/anatomy.png" },
-  { name: "Física", href: "/?subject=Física", imageSrc: "/images/physics.png" },
-  { name: "Química", href: "/?subject=Química", imageSrc: "/images/chemistry.png" },
-  { name: "Biología", href: "/?subject=Biología", imageSrc: "/images/biology.png" },
-  { name: "Historia", href: "/?subject=Historia", imageSrc: "/images/history.png" },
-  { name: "Idiomas", href: "/?subject=Idiomas", imageSrc: "/images/languages.png" },
+  { name: "Bioquímica", href: "/examenes?subject=Bioquímica", imageSrc: "/images/biochemistry.png" },
+  { name: "Programación", href: "/examenes?subject=Programación", imageSrc: "/images/programming.png" },
+  { name: "Matemáticas", href: "/examenes?subject=Matemáticas", imageSrc: "/images/math.png" },
+  { name: "Anatomía", href: "/examenes?subject=Anatomía", imageSrc: "/images/anatomy.png" },
+  { name: "Física", href: "/examenes?subject=Física", imageSrc: "/images/physics.png" },
+  { name: "Química", href: "/examenes?subject=Química", imageSrc: "/images/chemistry.png" },
+  { name: "Biología", href: "/examenes?subject=Biología", imageSrc: "/images/biology.png" },
+  { name: "Historia", href: "/examenes?subject=Historia", imageSrc: "/images/history.png" },
+  { name: "Idiomas", href: "/examenes?subject=Idiomas", imageSrc: "/images/languages.png" },
 ];
 
 const getCardsPerView = () => {

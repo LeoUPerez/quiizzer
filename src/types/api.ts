@@ -36,6 +36,9 @@ export interface QuizSummaryDto {
   title: string;
   topic: string;
   questionCount: number;
+  questionTypes: QuestionType[];
+  createdAt: string;
+  authorName: string | null;
   /** Último intento del usuario en este examen, si existe. */
   latestAttempt: AttemptSummaryDto | null;
 }
